@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.TimeZone;
 
 
 @WebServlet(value = "/time")
@@ -16,36 +18,21 @@ public class TimeServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        Clock clock;
         String timeZone;
         try {
             timeZone = req.getParameter("timezone").replace(" ", "+");
-            clock = Clock.system(ZoneId.of(timeZone));
-
-
-        }catch (Exception exception){
-            timeZone = "UTC";
-            clock = Clock.system(ZoneId.of(timeZone));
 
         }
-
-
-
-        LocalDateTime time = LocalDateTime.now(clock);
+        catch (Exception exception){
+            timeZone = "UTC";
+        }
         resp.setContentType("text/html; charset=utf-8");
-        resp.getWriter().write(formatDate(time,timeZone));
+        resp.getWriter().write(getTime(timeZone));
         resp.getWriter().close();
     }
-    private String formatDate(LocalDateTime time, String timeZone){
-        String result;
-        result = time.getYear() + "-" +
-        time.getMonthValue() + "-" +
-        time.getDayOfMonth() + "  " +
-        time.getHour() + ":" +
-        time.getMinute() + ":" +
-        time.getSecond() + "  " +
-        timeZone;
-        return result;
+    private String getTime(String timeZone){
+        LocalDateTime localNow = LocalDateTime.now(TimeZone.getTimeZone(ZoneId.of(timeZone)).toZoneId());
+        return localNow.format(DateTimeFormatter.ofPattern("YYYY-MM-DD HH:mm:ss")) + " " + timeZone;
     }
 
 }
