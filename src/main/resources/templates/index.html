@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Servlet example</title>
+</head>
+<body>
+
+
+<form th:if="${action == 'enterTimeZone'}" method="get">
+    <h2>Please enter your details</h2>
+    <label for="time">Time zone: </label>
+    <input type="text" id="time" name="timezone">
+    <button type="submit">OK</button>
+    <br>
+    <br>
+    <span th:text="${showTime}"></span>
+
+
+</form>
+<form th:if="${action == 'invalid'}" action="http://localhost:8080" method="get">
+    <h2 th:text="${invalidTimeZone}"></h2>
+    <h2>Not correct Time Zone </h2>
+    <button type="submit">Return</button>
+</form>
+</body>
+</html>
