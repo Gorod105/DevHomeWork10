@@ -11,36 +11,33 @@ import org.example.config.TemplateConfig;
 import org.thymeleaf.context.Context;
 
 import java.io.IOException;
-import java.time.ZoneId;
 import java.util.Arrays;
-import java.util.Optional;
-import java.util.Set;
 
 @WebFilter(value = "/")
 public class TimezoneValidateFilter extends HttpFilter {
     TemplateConfig templateConfig = new TemplateConfig();
 
     @Override
-    protected void doFilter(HttpServletRequest req, HttpServletResponse res, FilterChain chain) throws IOException, ServletException {
+    public void doFilter(HttpServletRequest req, HttpServletResponse res, FilterChain chain) throws IOException, ServletException {
         String timeZone = req.getParameter("timeZone");
         Context context = new Context();
         Cookie[] cookies = req.getCookies();
         boolean any = Arrays.stream(cookies).anyMatch(c -> c.getName().equals("timeZone"));
-        System.out.println(any);
         if (any){
-            chain.doFilter(req,res);
+            chain.doFilter(req, res);
+            return;
         }
         if (validateTimeZone(timeZone)){
-            chain.doFilter(req,res);
-        }else {
+            chain.doFilter(req, res);
+            return;
+        } else {
             context.setVariable("action", "invalid");
             context.setVariable("invalidTimeZone", timeZone);
             templateConfig.process("index", context, res);
         }
-
     }
+
     public static boolean validateTimeZone(String timeZone){
-        Set<String> availableZoneIds = ZoneId.getAvailableZoneIds();
-        return availableZoneIds.contains(timeZone);
+        return TimeServlet.validateTimeZone(timeZone);
     }
 }

@@ -25,12 +25,11 @@ public class TimeServlet extends HttpServlet {
         Context context = new Context();
         context.setVariable("action", "enterTimeZone");
         timeZone = req.getParameter("timeZone");
-        if (timeZone != null ) {
+        if (validateTimeZone(timeZone)) {
             resp.addCookie(new Cookie("timeZone", timeZone));
         }else if (Arrays.stream(req.getCookies()).noneMatch(c -> c.getName().equals("timeZone"))){
             resp.addCookie(new Cookie("timeZone", "UTC"));
         }
-        if (timeZone == null) {
             Cookie[] cookies = req.getCookies();
             if (cookies != null) {
                 for (Cookie c : cookies) {
@@ -40,17 +39,22 @@ public class TimeServlet extends HttpServlet {
                     }
                 }
             }
-        }
         String getTime = getTime(timeZone);
-
         context.setVariable("showTime", getTime);
-
         templateConfig.process("index", context, resp);
     }
 
     private String getTime(String timeZone) {
         LocalDateTime localNow = LocalDateTime.now(TimeZone.getTimeZone(ZoneId.of(timeZone)).toZoneId());
         return localNow.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + " " + timeZone;
+    }
+    public static boolean validateTimeZone(String timeZone){
+        String[] availableZoneIds = TimeZone.getAvailableIDs();
+        if (timeZone != null) {
+            timeZone = timeZone.replace("UTC", "Etc/GMT");
+        }
+
+        return Arrays.asList(availableZoneIds).contains(timeZone);
     }
 
 }

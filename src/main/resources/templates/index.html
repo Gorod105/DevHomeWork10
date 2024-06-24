@@ -18,10 +18,9 @@
 
 
 </form>
-<form th:if="${action == 'invalid'}" action="http://localhost:8080" method="get">
+<form th:if="${action == 'invalid'}">
     <h2 th:text="${invalidTimeZone}"></h2>
     <h2>Not correct Time Zone </h2>
-    <button type="submit">Return</button>
 </form>
 </body>
 </html>
